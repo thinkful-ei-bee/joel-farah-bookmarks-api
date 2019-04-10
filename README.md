@@ -1,5 +1,6 @@
 # Bookmarks API
-
+Databases and Express
+Module 11 section 15 and then 16
 Built using the Trelloyes boilerplate from previous assignment. Built to mirror this API: https://thinkful-list-api.herokuapp.com/endpoints/bookmarks
 
 # Bookmarks API requirements
