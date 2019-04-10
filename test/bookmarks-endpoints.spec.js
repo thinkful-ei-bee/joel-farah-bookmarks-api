@@ -20,11 +20,12 @@ describe.only('Bookmarks Endpoints', function() {
 
   afterEach('cleanup', () => db('bookmarks').truncate())
 
-  describe(`GET /bookmarks`, () => {
+  describe(`GET /api/bookmarks`, () => {
     context(`Given no bookmarks`, () => {
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
-          .get('/bookmarks')
+          .get('/api/bookmarks')
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
           .expect(200, [])
       })
     })
@@ -40,18 +41,20 @@ describe.only('Bookmarks Endpoints', function() {
 
       it('responds with 200 and all of the bookmarks', () => {
         return supertest(app)
-          .get('/bookmarks')
+          .get('/api/bookmarks')
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
           .expect(200, testBookmarks)
       })
     })
   })
 
-  describe(`GET /bookmarks/:bookmark_id`, () => {
+  describe(`GET /api/bookmarks/:bookmark_id`, () => {
     context(`Given no bookmarks`, () => {
       it(`responds with 404`, () => {
         const bookmarkId = 123456
         return supertest(app)
-          .get(`/bookmarks/${bookmarksId}`)
+          .get(`/api/bookmarks/${bookmarkId}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
           .expect(404, { error: { message: `Bookmark doesn't exist` } })
       })
     })
@@ -69,7 +72,8 @@ describe.only('Bookmarks Endpoints', function() {
         const bookmarkId = 1
         const expectedBookmark = testBookmarks[bookmarkId - 1]
         return supertest(app)
-          .get(`/bookmarks/${bookmarkId}`)
+          .get(`/api/bookmarks/${bookmarkId}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
           .expect(200, expectedBookmark)
       })
     })

@@ -58,6 +58,7 @@ bookmarkRouter
 bookmarkRouter
   .route('/bookmarks/:bookmark_id')
   .get((req, res, next) => {
+    const knexInstance = req.app.get('db')
     BookmarksService.getById(knexInstance, req.params.bookmark_id)
     .then(bookmark => {
       if (!bookmark) {
@@ -67,10 +68,10 @@ bookmarkRouter
       }
       res.json({
         id: bookmark.id,
-        title: bookmark.bookmark_title,
-        url: bookmark.bookmark_url,
-        desc: bookmark.bookmark_desc,
-        rating: bookmark.bookmark_rating
+        bookmark_title: bookmark.bookmark_title,
+        bookmark_url: bookmark.bookmark_url,
+        bookmark_desc: bookmark.bookmark_desc,
+        bookmark_rating: bookmark.bookmark_rating
       })
     })
     .catch(next)
