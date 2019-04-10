@@ -20,11 +20,11 @@ describe.only('Bookmarks Endpoints', function() {
 
   afterEach('cleanup', () => db('bookmarks').truncate())
 
-  describe(`GET /api/bookmarks`, () => {
+  describe(`GET /bookmarks`, () => {
     context(`Given no bookmarks`, () => {
       it(`responds with 200 and an empty list`, () => {
         return supertest(app)
-          .get('/api/bookmarks')
+          .get('/bookmarks')
           .expect(200, [])
       })
     })
@@ -40,18 +40,18 @@ describe.only('Bookmarks Endpoints', function() {
 
       it('responds with 200 and all of the bookmarks', () => {
         return supertest(app)
-          .get('/api/bookmarks')
+          .get('/bookmarks')
           .expect(200, testBookmarks)
       })
     })
   })
 
-  describe(`GET /api/bookmarks/:bookmark_id`, () => {
+  describe(`GET /bookmarks/:bookmark_id`, () => {
     context(`Given no bookmarks`, () => {
       it(`responds with 404`, () => {
         const bookmarkId = 123456
         return supertest(app)
-          .get(`/api/bookmarks/${bookmarksId}`)
+          .get(`/bookmarks/${bookmarksId}`)
           .expect(404, { error: { message: `Bookmark doesn't exist` } })
       })
     })
@@ -69,7 +69,7 @@ describe.only('Bookmarks Endpoints', function() {
         const bookmarkId = 1
         const expectedBookmark = testBookmarks[bookmarkId - 1]
         return supertest(app)
-          .get(`/api/bookmarks/${bookmarkId}`)
+          .get(`/bookmarks/${bookmarkId}`)
           .expect(200, expectedBookmark)
       })
     })
