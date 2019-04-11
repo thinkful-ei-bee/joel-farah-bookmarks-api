@@ -120,7 +120,7 @@ describe.only('Bookmarks Endpoints', function() {
           error: { message: `Missing 'bookmark_title' in request body` }
         })
     })
-    it(`responds with 400 and an error message when the 'bookmark_title' is missing`, () => {
+    it(`responds with 400 and an error message when the 'bookmark_url' is missing`, () => {
       return supertest(app)
         .post('/api/bookmarks')
         .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
