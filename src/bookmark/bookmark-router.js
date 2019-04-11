@@ -63,6 +63,15 @@ bookmarkRouter
     })
     .catch(next)
   })
+  .delete((req, res, next) => {
+    console.log(req.params);
+    BookmarksService.deleteBookmark(req.app.get('db'), req.params.bookmark_id
+    )
+    .then(() => {
+      res.status(204).end()
+    })
+    .catch(next)
+  })
   // .delete((req, res) => {
   //   // move implementation logic into here
   //   const { id } = req.params;

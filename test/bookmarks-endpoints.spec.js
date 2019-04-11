@@ -3,6 +3,10 @@ const knex = require('knex')
 const app = require('../src/app')
 const { makeBookmarksArray } = require('./bookmarks.fixtures')
 
+// TODO
+//xss tests for the POST /articles and GET /articles responses to ensure that the content and title get sanitized in those endpoints responses too?
+//Also, refactor your code and tests to clean up any intentionally repeated code.
+
 describe.only('Bookmarks Endpoints', function() {
     let db
   
@@ -160,13 +164,12 @@ describe.only('Bookmarks Endpoints', function() {
         })
     })
 
-
   })
 
   describe.only(`DELETE /bookmarks/:bookmark_id`, () => {
     context('Given there are bookmarks in the database', () => {
       const testBookmarks = makeBookmarksArray()
-
+      console.log(testBookmarks);
       beforeEach('insert bookmarks', () => {
         return db
           .into('bookmarks')
@@ -174,7 +177,7 @@ describe.only('Bookmarks Endpoints', function() {
       })
 
       it('responds with 204 and removes the bookmark', () => {
-        const idToRemove = 2
+        const idToRemove = 1
         const expectedBookmarks = testBookmarks.filter(bookmark => bookmark.id !== idToRemove)
         return supertest(app)
           .delete(`/api/bookmarks/${idToRemove}`)
@@ -183,10 +186,12 @@ describe.only('Bookmarks Endpoints', function() {
           .then(res =>
             supertest(app)
               .get(`/api/bookmarks`)
+              .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
               .expect(expectedBookmarks)
           )
       })
     })
+
   })
 
 })
