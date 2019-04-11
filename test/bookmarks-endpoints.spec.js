@@ -163,4 +163,30 @@ describe.only('Bookmarks Endpoints', function() {
 
   })
 
+  describe.only(`DELETE /bookmarks/:bookmark_id`, () => {
+    context('Given there are bookmarks in the database', () => {
+      const testBookmarks = makeBookmarksArray()
+
+      beforeEach('insert bookmarks', () => {
+        return db
+          .into('bookmarks')
+          .insert(testBookmarks)
+      })
+
+      it('responds with 204 and removes the bookmark', () => {
+        const idToRemove = 2
+        const expectedBookmarks = testBookmarks.filter(bookmark => bookmark.id !== idToRemove)
+        return supertest(app)
+          .delete(`/api/bookmarks/${idToRemove}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .expect(204)
+          .then(res =>
+            supertest(app)
+              .get(`/api/bookmarks`)
+              .expect(expectedBookmarks)
+          )
+      })
+    })
+  })
+
 })
