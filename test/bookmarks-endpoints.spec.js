@@ -81,7 +81,7 @@ describe.only('Bookmarks Endpoints', function() {
           .expect(200, expectedBookmark)
       })
     })
-////////////////////////////////////
+
     context(`Given an XSS attack bookmark`, () => {
     const maliciousBookmark = {
       id: 911,
@@ -167,6 +167,15 @@ describe.only('Bookmarks Endpoints', function() {
   })
 
   describe.only(`DELETE /bookmarks/:bookmark_id`, () => {
+    context(`Given no bookmarks`, () => {
+      it(`responds with 404`, () => {
+        const bookmarkId = 123456
+        return supertest(app)
+          .delete(`/api/bookmarks/${bookmarkId}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .expect(404, { error: { message: `Bookmark doesn't exist` } })
+      })
+    })
     context('Given there are bookmarks in the database', () => {
       const testBookmarks = makeBookmarksArray()
       console.log(testBookmarks);

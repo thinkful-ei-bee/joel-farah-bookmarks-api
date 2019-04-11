@@ -41,64 +41,52 @@ bookmarkRouter
           .json(bookmark)
       })
       .catch(next)
-   
   })
 bookmarkRouter
   .route('/bookmarks/:bookmark_id')
-  .get((req, res, next) => {
-    BookmarksService.getById(req.app.get('db'), req.params.bookmark_id)
-    .then(bookmark => {
-      if (!bookmark) {
-        return res.status(404).json({
-          error: { message: `Bookmark doesn't exist` }
-        })
-      }
-      res.json({
-        id: bookmark.id,
-        bookmark_title: xss(bookmark.bookmark_title),
-        bookmark_url: xss(bookmark.bookmark_url),
-        bookmark_desc: xss(bookmark.bookmark_desc),
-        bookmark_rating: bookmark.bookmark_rating
+  .all((req, res, next) => {
+    return BookmarksService.getById(
+      req.app.get('db'),
+      req.params.bookmark_id
+    )
+      .then(bookmark => {
+        if (!bookmark) {
+          return res.status(404).json({
+            error: { message: `Bookmark doesn't exist` }
+          })
+        }
+        res.bookmark = bookmark // save the article for the next middleware
+        return next() // don't forget to call next so the next middleware happens!
       })
-    })
-    .catch(next)
+      .catch(next)
+  })
+  .get((req, res, next) => {
+    res.json(serializeArticle(res.bookmark))
+    // BookmarksService.getById(req.app.get('db'), req.params.bookmark_id)
+    // .then(bookmark => {
+    //   if (!bookmark) {
+    //     return res.status(404).json({
+    //       error: { message: `Bookmark doesn't exist` }
+    //     })
+    //   }
+    //   res.json({
+    //     id: bookmark.id,
+    //     bookmark_title: xss(bookmark.bookmark_title),
+    //     bookmark_url: xss(bookmark.bookmark_url),
+    //     bookmark_desc: xss(bookmark.bookmark_desc),
+    //     bookmark_rating: bookmark.bookmark_rating
+    //   })
+    // })
+    // .catch(next)
   })
   .delete((req, res, next) => {
     console.log(req.params);
-    BookmarksService.deleteBookmark(req.app.get('db'), req.params.bookmark_id
+    return BookmarksService.deleteBookmark(req.app.get('db'), req.params.bookmark_id
     )
     .then(() => {
-      res.status(204).end()
+      return res.status(204).end()
     })
     .catch(next)
   })
-  // .delete((req, res) => {
-  //   // move implementation logic into here
-  //   const { id } = req.params;
-  
-  //   const bookmarkIndex = bookmarks.findIndex(b => b.id == id);
-  
-  //   if (bookmarkIndex === -1) {
-  //     logger.error(`Bookmark with id ${id} not found.`);
-  //     return res
-  //       .status(404)
-  //       .send('Not found');
-  //   }
-  
-  //   //remove bookmark from lists
-  //   //assume bookmarkIds are not duplicated in the bookmarkIds array
-  //   lists.forEach(list => {
-  //     const bookmarkIds = list.bookmarkIds.filter(bid => bid !== id);
-  //     list.bookmarkIds = bookmarkIds;
-  //   });
-  
-  //   bookmarks.splice(bookmarkIndex, 1);
-  
-  //   logger.info(`Bookmark with id ${id} deleted.`);
-  
-  //   res
-  //     .status(204)
-  //     .end();
-  // })
 
 module.exports = bookmarkRouter
