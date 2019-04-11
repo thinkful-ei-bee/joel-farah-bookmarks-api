@@ -29,45 +29,6 @@ bookmarkRouter
     .catch(next)
    
   })
-  // OLD POST CODE:
-  // .post(bodyParser, (req, res) => {
-  //   const { title, url, desc, rating } = req.body;
-  
-  //   if (!title) {
-  //     logger.error(`Title is required`);
-  //     return res
-  //       .status(400)
-  //       .send('Invalid data');
-  //   }
-    
-  //   if (!url) {
-  //     logger.error(`Url is required`);
-  //     return res
-  //       .status(400)
-  //       .send('Invalid data');
-  //   }
-  
-  //   // get an id
-  //   const id = uuid();
-
-  //   const bookmark = {
-  //     id,
-  //     title,
-  //     url,
-  //     desc,
-  //     rating
-  //   };
-  
-  //   bookmarks.push(bookmark);
-  
-  //   logger.info(`Bookmark with id ${id} created`);
-  
-  //   res
-  //     .status(201)
-  //     .location(`http://localhost:8000/bookmarks/${id}`)
-  //     .json(bookmark);
-  // })
-
 bookmarkRouter
   .route('/bookmarks/:bookmark_id')
   .get((req, res, next) => {

@@ -107,6 +107,20 @@ describe.only('Bookmarks Endpoints', function() {
             .expect(res.body)
         )
     })
+    it(`responds with 400 and an error message when the 'title' is missing`, () => {
+      return supertest(app)
+        .post('/api/bookmarks')
+        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .send({
+          style: 'Listicle',
+          content: 'Test new article content...'
+        })
+        .expect(400, {
+          error: { message: `Missing 'title' in request body` }
+        })
+    })
+
+
   })
 
 })
