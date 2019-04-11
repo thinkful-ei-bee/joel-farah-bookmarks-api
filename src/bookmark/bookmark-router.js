@@ -7,26 +7,39 @@ const bookmarkRouter = express.Router()
 const bodyParser = express.json()
 
 bookmarkRouter
-  .get('/bookmarks', (req, res, next) => {
-    const knexInstance = req.app.get('db')
-    BookmarksService.getAllBookmarks(knexInstance)
-    .then(bookmarks => {
-      res.json(bookmarks)
-    })
-    .catch(next)
-  }) 
-  .post('/bookmarks', bodyParser, (req, res, next) => {
-    const { bookmark_title, bookmark_url, bookmark_desc, bookmark_rating } = req.body;
-    const newBookmark = { bookmark_title, bookmark_url, bookmark_desc, bookmark_rating, };   
+  .route('/bookmarks')
+    .get((req, res, next) => {
+      const knexInstance = req.app.get('db')
+      BookmarksService.getAllBookmarks(knexInstance)
+      .then(bookmarks => {
+        res.json(bookmarks)
+      })
+      .catch(next)
+    }) 
+    .post(bodyParser, (req, res, next) => {
+      const { bookmark_title, bookmark_url, bookmark_desc, bookmark_rating } = req.body;
+      const newBookmark = { bookmark_title, bookmark_url, bookmark_desc, bookmark_rating };   
+      
+      if(!bookmark_title) {
+        return res
+          .status(400)
+          .json({ error: { message: `Missing 'bookmark_title' in request body` }})
+      }
 
-    BookmarksService.insertBookmark(req.app.get('db'), newBookmark)
-    .then(bookmark => {
-      res
-        .status(201)
-        .location(`/bookmarks/${bookmark.id}`)
-        .json(bookmark)
-    })
-    .catch(next)
+      if(!bookmark_url) {
+        return res
+          .status(400)
+          .json({ error: { message: `Missing 'bookmark_url' in request body` }})
+      }
+
+      BookmarksService.insertBookmark(req.app.get('db'), newBookmark)
+      .then(bookmark => {
+        res
+          .status(201)
+          .location(`/bookmarks/${bookmark.id}`)
+          .json(bookmark)
+      })
+      .catch(next)
    
   })
 bookmarkRouter

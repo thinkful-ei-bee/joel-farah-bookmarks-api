@@ -16,8 +16,9 @@ const morganOption = (process.env.NODE_ENV === 'production')
 app.use(morgan(morganOption))
 app.use(helmet())
 app.use(cors())
-
+//app.use(express.json())
 app.get("/", (req, res) => res.json({hello: "universe"}));
+//app.post("/foo", (req, res) => { res.json(req.body) });
 
 app.use(authMiddleware)
 app.use('/api', bookmarkRouter)
