@@ -78,4 +78,27 @@ describe.only('Bookmarks Endpoints', function() {
       })
     })
   })
+
+  describe.only(`POST /articles`, () => {
+    it(`creates an article, responding with 201 and the new article`,  function() {
+      const newBookmark = {
+        bookmark_title: 'Test new bookmark',
+        bookmark_url: 'example.com',
+        bookmark_desc: 'Test new bookmark desc...',
+        bookmark_rating: 4
+      }
+      return supertest(app)
+        .post('/articles')
+        .send(newArticle)
+        .expect(201)
+        .expect(res => {
+          expect(res.body.bookmark_title).to.eql(newBookmark.bookmark_title)
+          expect(res.body.bookmark_url).to.eql(newBookmark.bookmark_url)
+          expect(res.body.bookmark_desc).to.eql(newBookmark.bookmark_desc)
+          expect(res.body.bookmark_rating).to.eql(newBookmark.bookmark_rating)
+          expect(res.body).to.have.property('id')
+        })
+    })
+  })
+
 })

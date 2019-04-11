@@ -15,8 +15,41 @@ bookmarkRouter
     })
     .catch(next)
   }) 
-  
+  .post('/bookmarks', bodyParser, (req, res, next) => {
+    const { bookmark_title, bookmark_url, bookmark_desc, bookmark_rating } = req.body;
+    const knexInstance = req.app.get('db')
 
+    if (!bookmark_title) {
+      logger.error(`Title is required`);
+      return res
+        .status(400)
+        .send('Invalid data');
+    }
+    
+    if (!bookmark_url) {
+      logger.error(`Url is required`);
+      return res
+        .status(400)
+        .send('Invalid data');
+    }
+
+    const newBookmark = {
+      bookmark_title,
+      bookmark_url,
+      bookmark_desc,
+      bookmark_rating,
+    };
+  
+    BookmarksService.insertBookmark(knexInstance, newBookmark)
+  
+    logger.info(`Bookmark with id ${id} created`);
+  
+    res
+      .status(201)
+      .location(`http://localhost:8000/bookmarks/${id}`)
+      .json(bookmark);
+  })
+  // OLD POST CODE:
   // .post(bodyParser, (req, res) => {
   //   const { title, url, desc, rating } = req.body;
   
