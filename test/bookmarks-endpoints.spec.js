@@ -79,8 +79,8 @@ describe.only('Bookmarks Endpoints', function() {
     })
   })
 
-  describe.only(`POST /articles`, () => {
-    it(`creates an article, responding with 201 and the new article`,  function() {
+  describe.only(`POST /api/bookmarks`, () => {
+    it(`creates a bookmark, responding with 201 and the new bookmark`,  function() {
       const newBookmark = {
         bookmark_title: 'Test new bookmark',
         bookmark_url: 'example.com',
@@ -88,16 +88,24 @@ describe.only('Bookmarks Endpoints', function() {
         bookmark_rating: 4
       }
       return supertest(app)
-        .post('/articles')
-        .send(newArticle)
+        .post('/api/bookmarks')
+        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .send(newBookmark)
         .expect(201)
         .expect(res => {
+          expect(res.body).to.have.property('id')
           expect(res.body.bookmark_title).to.eql(newBookmark.bookmark_title)
           expect(res.body.bookmark_url).to.eql(newBookmark.bookmark_url)
           expect(res.body.bookmark_desc).to.eql(newBookmark.bookmark_desc)
           expect(res.body.bookmark_rating).to.eql(newBookmark.bookmark_rating)
-          expect(res.body).to.have.property('id')
+          expect(res.headers.location).to.eql(`/bookmarks/${res.body.id}`)
         })
+        .then(res =>
+          supertest(app)
+            .get(`/api/bookmarks/${res.body.id}`)
+            .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+            .expect(res.body)
+        )
     })
   })
 

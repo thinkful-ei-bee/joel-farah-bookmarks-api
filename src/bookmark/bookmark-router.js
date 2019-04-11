@@ -17,37 +17,17 @@ bookmarkRouter
   }) 
   .post('/bookmarks', bodyParser, (req, res, next) => {
     const { bookmark_title, bookmark_url, bookmark_desc, bookmark_rating } = req.body;
-    const knexInstance = req.app.get('db')
+    const newBookmark = { bookmark_title, bookmark_url, bookmark_desc, bookmark_rating, };   
 
-    if (!bookmark_title) {
-      logger.error(`Title is required`);
-      return res
-        .status(400)
-        .send('Invalid data');
-    }
-    
-    if (!bookmark_url) {
-      logger.error(`Url is required`);
-      return res
-        .status(400)
-        .send('Invalid data');
-    }
-
-    const newBookmark = {
-      bookmark_title,
-      bookmark_url,
-      bookmark_desc,
-      bookmark_rating,
-    };
-  
-    BookmarksService.insertBookmark(knexInstance, newBookmark)
-  
-    logger.info(`Bookmark with id ${id} created`);
-  
-    res
-      .status(201)
-      .location(`http://localhost:8000/bookmarks/${id}`)
-      .json(bookmark);
+    BookmarksService.insertBookmark(req.app.get('db'), newBookmark)
+    .then(bookmark => {
+      res
+        .status(201)
+        .location(`/bookmarks/${bookmark.id}`)
+        .json(bookmark)
+    })
+    .catch(next)
+   
   })
   // OLD POST CODE:
   // .post(bodyParser, (req, res) => {
