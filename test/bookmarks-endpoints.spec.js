@@ -77,9 +77,35 @@ describe.only('Bookmarks Endpoints', function() {
           .expect(200, expectedBookmark)
       })
     })
+////////////////////////////////////
+    context(`Given an XSS attack bookmark`, () => {
+    const maliciousBookmark = {
+      id: 911,
+      bookmark_title: 'Naughty naughty very naughty <script>alert("xss");</script>',
+      bookmark_url: 'example.com',
+      bookmark_desc: `Bad image <img src="https://url.to.file.which/does-not.exist" onerror="alert(document.cookie);">. But not <strong>all</strong> bad.`
+    }
+
+    beforeEach('insert malicious bookmark', () => {
+      return db
+        .into('bookmarks')
+        .insert([ maliciousBookmark ])
+    })
+
+    it('removes XSS attack content', () => {
+      return supertest(app)
+        .get(`/api/bookmarks/${maliciousBookmark.id}`)
+        .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+        .expect(200)
+        .expect(res => {
+          expect(res.body.bookmark_title).to.eql('Naughty naughty very naughty &lt;script&gt;alert(\"xss\");&lt;/script&gt;')
+          expect(res.body.bookmark_desc).to.eql(`Bad image <img src="https://url.to.file.which/does-not.exist">. But not <strong>all</strong> bad.`)
+        })
+    })
+  })
   })
 
-  describe.only(`POST /api/bookmarks`, () => {
+  describe(`POST /api/bookmarks`, () => {
     it(`creates a bookmark, responding with 201 and the new bookmark`,  function() {
       const newBookmark = {
         bookmark_title: 'Test new bookmark',
