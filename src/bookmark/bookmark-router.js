@@ -1,4 +1,5 @@
 const express = require('express')
+const xss = require('xss')
 const uuid = require('uuid/v4')
 const logger = require('../logger')
 const BookmarksService = require('./bookmark-service')
@@ -54,9 +55,9 @@ bookmarkRouter
       }
       res.json({
         id: bookmark.id,
-        bookmark_title: bookmark.bookmark_title,
-        bookmark_url: bookmark.bookmark_url,
-        bookmark_desc: bookmark.bookmark_desc,
+        bookmark_title: xss(bookmark.bookmark_title),
+        bookmark_url: xss(bookmark.bookmark_url),
+        bookmark_desc: xss(bookmark.bookmark_desc),
         bookmark_rating: bookmark.bookmark_rating
       })
     })
