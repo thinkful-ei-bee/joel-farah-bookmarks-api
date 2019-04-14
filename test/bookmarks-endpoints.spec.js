@@ -4,10 +4,9 @@ const app = require('../src/app')
 const { makeBookmarksArray } = require('./bookmarks.fixtures')
 
 // TODO
-//xss tests for the POST /articles and GET /articles responses to ensure that the content and title get sanitized in those endpoints responses too?
-//Also, refactor your code and tests to clean up any intentionally repeated code.
+// Tests for patch end point
 
-describe.only('Bookmarks Endpoints', function() {
+describe('Bookmarks Endpoints', function() {
     let db
   
     before('make knex instance', () => {
@@ -166,7 +165,7 @@ describe.only('Bookmarks Endpoints', function() {
 
   })
 
-  describe.only(`DELETE /bookmarks/:bookmark_id`, () => {
+  describe(`DELETE /api/bookmarks/:bookmark_id`, () => {
     context(`Given no bookmarks`, () => {
       it(`responds with 404`, () => {
         const bookmarkId = 123456
@@ -203,4 +202,52 @@ describe.only('Bookmarks Endpoints', function() {
 
   })
 
+  describe.only(`PATCH /api/bookmarks/:bookmark_id`, () => {
+    context(`Given no bookmarks`, () => {
+      it(`responds with 404`, () => {
+        const bookmarkId = 123456
+        return supertest(app)
+          .patch(`/api/bookmarks/${bookmarkId}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .expect(404, { error: { message: `Bookmark doesn't exist` } })
+      })
+    })
+
+    context('Given there are bookmarks in the database', () => {
+      const testBookmarks = makeBookmarksArray()
+  
+      beforeEach('insert bookmarks', () => {
+        return db
+          .into('bookmarks')
+          .insert(testBookmarks)
+      })
+
+      it('responds with 204 and updates the bookmark', () => {
+        const idToUpdate = 2
+        const updateBookmark = {
+          bookmark_title: 'Airtable - Updated',
+          bookmark_desc: 'The best Spreadsheet',
+          bookmark_rating: 5
+        }
+        const expectedBookmark = {
+          ...testBookmarks[idToUpdate - 1],
+          ...updateBookmark
+        }
+        return supertest(app)
+          .patch(`/api/bookmarks/${idToUpdate}`)
+          .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+          .send(updateBookmark)
+          .expect(204)
+          .then(res =>
+            supertest(app)
+              .get(`/api/bookmarks/${idToUpdate}`)
+              .set('Authorization', `Bearer ${process.env.API_TOKEN}`)
+              .expect(expectedBookmark)
+          )
+      })
+    })
+  
+  })
+
+  
 })
